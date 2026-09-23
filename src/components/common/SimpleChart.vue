@@ -37,6 +37,8 @@ function draw() {
   const max = Math.max(...values, 1)
   const min = Math.min(...values, 0)
   const range = max - min || 1
+  // 数值跨度小时保留一位小数，避免价格类刻度被取整成同一个值
+  const fmtAxis = (v) => (range < 4 ? Number(v.toFixed(1)).toString() : String(Math.round(v)))
   const padX = 30
   const padY = 20
   const chartW = width - padX * 2
@@ -56,8 +58,8 @@ function draw() {
     ctx.moveTo(padX, y)
     ctx.lineTo(width - padX, y)
     ctx.stroke()
-    const val = Math.round(max - (range / 4) * g)
-    ctx.fillText(String(val), 4, y + 4)
+    const val = max - (range / 4) * g
+    ctx.fillText(fmtAxis(val), 4, y + 4)
   }
 
   if (props.type === 'bar') {

@@ -105,7 +105,7 @@ function fmt(iso) {
       <div v-else class="history">
         <div v-for="h in shopping.history" :key="h.id" class="hist-row">
           <span class="muted">{{ fmt(h.date) }}</span>
-          <span class="items">{{ h.items.map((i) => `${i.name}×${i.quantity}${i.unit}`).join('、') }}</span>
+          <span class="items">{{ h.items.map((i) => `${i.name}×${i.quantity}${i.unit}(¥${Number(i.unitPrice || 0).toFixed(1).replace(/\.0$/, '')}/${i.unit})`).join('、') }}</span>
           <span class="total">¥{{ (h.total || 0).toFixed(1) }}</span>
         </div>
       </div>

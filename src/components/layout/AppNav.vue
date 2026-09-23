@@ -8,6 +8,7 @@ const links = [
   { to: '/inventory', label: '食材库存', icon: '🥬', badge: () => inventory.items.length },
   { to: '/meal-plan', label: '每周食谱', icon: '📅' },
   { to: '/shopping', label: '采购清单', icon: '🛒' },
+  { to: '/prices', label: '价格走势', icon: '📈' },
   { to: '/diet', label: '饮食记录', icon: '🍽️' },
   { to: '/dashboard', label: '饮食看板', icon: '📊' },
   { to: '/challenge', label: '清理挑战', icon: '🧹' },
