@@ -7,6 +7,7 @@ const props = defineProps({
   data: { type: Array, default: () => [] }, // 数值数组
   color: { type: String, default: '#4caf50' },
   height: { type: Number, default: 200 },
+  baselineZero: { type: Boolean, default: true }, // 纵轴是否从 0 起；false 时聚焦数据波动区间
 })
 
 const canvas = ref(null)
@@ -34,8 +35,19 @@ function draw() {
 
   const values = props.data.map(Number)
   if (!values.length) return
-  const max = Math.max(...values, 1)
-  const min = Math.min(...values, 0)
+  const rawMax = Math.max(...values)
+  const rawMin = Math.min(...values)
+  let max, min
+  if (props.baselineZero) {
+    max = Math.max(rawMax, 1)
+    min = Math.min(rawMin, 0)
+  } else {
+    // 上下留 15% 余量，让价格波动不被压扁；单价不为负，下限钳到 0
+    const span = rawMax - rawMin
+    const pad = span > 0 ? span * 0.15 : Math.max(rawMax * 0.1, 1)
+    max = rawMax + pad
+    min = Math.max(0, rawMin - pad)
+  }
   const range = max - min || 1
   const padX = 30
   const padY = 20
@@ -56,7 +68,9 @@ function draw() {
     ctx.moveTo(padX, y)
     ctx.lineTo(width - padX, y)
     ctx.stroke()
-    const val = Math.round(max - (range / 4) * g)
+    const tick = max - (range / 4) * g
+    // 非 0 基线（如价格）保留一位小数；既有图表仍用整数刻度
+    const val = props.baselineZero ? Math.round(tick) : Math.round(tick * 10) / 10
     ctx.fillText(String(val), 4, y + 4)
   }
 
@@ -92,10 +106,17 @@ function draw() {
     })
   }
 
-  // 标签
+  // 标签（超过 8 个时等距抽稀，首尾保留）
   ctx.fillStyle = '#757575'
   ctx.textAlign = 'center'
+  const step = Math.ceil(props.labels.length / 8)
   props.labels.forEach((label, i) => {
+    if (
+      props.labels.length > 8 &&
+      i % step !== 0 &&
+      i !== props.labels.length - 1
+    )
+      return
     ctx.fillText(String(label), xAt(i), height - 4)
   })
 }
